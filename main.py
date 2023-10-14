@@ -34,18 +34,55 @@ def make_maze(w=30, h=30):
     #     result = result + (''.join(a + ['\n'] + b)) + '\n'
     # return result.strip()
 
-    maze  = '+--+--+--+--+--+--+--+--+--+--+\n'
-    maze += '|        |        |           |\n'
-    maze += '+--+  +  +  +--+  +  +  +--+  +\n'
-    maze += '|  |  |  |  |  |     |  |  |  |\n'
-    maze += '+  +  +  +  +  +--+--+  +  +  +\n'
-    maze += '|     |                 |     |\n'
-    maze += '+  +--+--+--+  +--+  +--+--+--+\n'
-    maze += '|  |              |           |\n'
-    maze += '+  +--+  +  +--+  +--+--+--+  +\n'
-    maze += '|        |                    |\n'
-    maze += '+--+--+--+--+--+--+--+--+--+--+'
-    return maze
+    mazes = ['', '', '']
+
+    mazes[0]  = '+--+--+--+--+--+--+--+--+--+--+\n'
+    mazes[0] += '|        |        |           |\n'
+    mazes[0] += '+--+  +  +  +--+  +  +  +--+  +\n'
+    mazes[0] += '|  |  |  |  |  |     |  |  |  |\n'
+    mazes[0] += '+  +  +  +  +  +--+--+  +  +  +\n'
+    mazes[0] += '|     |                 |     |\n'
+    mazes[0] += '+  +--+--+--+  +--+  +--+--+--+\n'
+    mazes[0] += '|  |              |           |\n'
+    mazes[0] += '+  +--+  +  +--+  +--+--+--+  +\n'
+    mazes[0] += '|        |                    |\n'
+    mazes[0] += '+--+--+--+--+--+--+--+--+--+--+'
+
+    mazes[1]  = '+--+--+--+--+--+--+--+--+--+--+\n'
+    mazes[1] += '|        |        |           |\n'
+    mazes[1] += '+--+  +  +--+--+  +  +--+  +  +\n'
+    mazes[1] += '|     |  |        |  |     |  |\n'
+    mazes[1] += '+--+--+  +  +--+--+  +  +--+  +\n'
+    mazes[1] += '|     |  |        |  |  |     |\n'
+    mazes[1] += '+  +--+  +--+--+  +  +  +  +--+\n'
+    mazes[1] += '|              |     |  |  |  |\n'
+    mazes[1] += '+  +--+--+  +  +  +--+  +  +  +\n'
+    mazes[1] += '|     |     |  |  |     |     |\n'
+    mazes[1] += '+--+  +--+  +  +--+  +--+--+  +\n'
+    mazes[1] += '|     |     |        |     |  |\n'
+    mazes[1] += '+  +--+  +--+--+  +--+  +  +  +\n'
+    mazes[1] += '|     |  |        |     |  |  |\n'
+    mazes[1] += '+--+  +  +--+  +  +  +  +  +  +\n'
+    mazes[1] += '|     |        |  |  |  |  |  |\n'
+    mazes[1] += '+  +--+--+  +  +  +  +  +--+  +\n'
+    mazes[1] += '|  |     |  |  |     |  |     |\n'
+    mazes[1] += '+  +  +  +  +  +--+--+  +  +--+\n'
+    mazes[1] += '|           |                 |\n'
+    mazes[1] += '+--+--+--+--+--+--+--+--+--+--+'
+    
+    mazes[2]  = '+--+--+--+--+--+--+--+\n'
+    mazes[2] += '|                 |  |\n'
+    mazes[2] += '+--+--+--+--+  +--+  +\n'
+    mazes[2] += '|                    |\n'
+    mazes[2] += '+  +--+--+--+  +  +--+\n'
+    mazes[2] += '|        |     |  |  |\n'
+    mazes[2] += '+  +--+  +--+--+  +  +\n'
+    mazes[2] += '|  |     |        |  |\n'
+    mazes[2] += '+  +  +--+  +--+--+  +\n'
+    mazes[2] += '|  |                 |\n'
+    mazes[2] += '+--+--+--+--+--+--+--+'
+
+    return mazes
 
 
 def drawmaze(maze, set1=[], set2=[], c='#', c2='*'):
@@ -99,41 +136,44 @@ def drawmaze(maze, set1=[], set2=[], c='#', c2='*'):
 #     def test_solve_maze(self):
 #         solve_maze()
 
-def solve_maze(name, si, fi, module):
-    source_path = list(module.MazeSolver(maze).astar(si.start, si.goal))
-    followup_path = list(module.MazeSolver(maze).astar(fi.start, fi.goal))
-    # print(len(source_path))
+def is_sublist(A, B):
+    if not A:
+        return True
+    if not B:
+        return False
+    if A[0] == B[0]:
+        return is_sublist(A[1:], B[1:])
+    return is_sublist(A, B[1:])
 
-    if fi.type == "match":
-        # append source
-        source_output = drawmaze(maze, list(source_path))
-        temp = source_output.split('\n')[5:]
-        source_output = ''
-        for line in temp:
-            source_output += line + '\n'
-        # Append followup
-        followup_output = drawmaze(maze, list(followup_path))
-        temp = followup_output.split('\n')[5:]
-        followup_output = ''
-        for line in temp:
-            followup_output += line + '\n'
 
-        if source_output == followup_output:
-            print(f"{name}: PASS")
-            return 0
-        else:
-            print(f"{name}: FAIL")
-            return 1
+def solve_maze(name, mazes, si, fi, module):
+    results = []
 
-    elif fi.type == "length":
-        if len(source_path) == len(followup_path):
-            print(f"{name}: PASS")
-            return 0
-        else:
-            print(f"{name}: FAIL")
-            return 1
+    for i in range(0, len(mazes)):
+        source_path = list(module.MazeSolver(mazes[i]).astar(si.start[i], si.goal[i]))
 
-    # print(drawmaze(maze, list(path)))
+        if fi.type == "contains":
+            followup_path = list(module.MazeSolver(mazes[i]).astar(source_path[round(len(source_path) / 2)], fi.goal[i]))
+            if is_sublist(followup_path, source_path):
+                results.append(0)
+            else:
+                results.append(1)
+
+        elif fi.type == "length":
+            followup_path = list(module.MazeSolver(mazes[i]).astar(fi.start[i], fi.goal[i]))
+            if len(source_path) == len(followup_path):
+                results.append(0)
+            else:
+                results.append(1)
+
+        # print(drawmaze(mazes[i], list(followup_path)))
+
+    outcome = 1 if sum(results) > 0 else 0
+    if outcome == 1:
+        print(f"{name}: FAIL ({results})")
+    else:
+        print(f"{name}: PASS ({results})")
+    return outcome
 
 
 # Types: Compare bottom, compare length
@@ -145,66 +185,71 @@ class Input(object):
 
 
 if __name__ == '__main__':
-    maze = make_maze(0, 0)
+    m = make_maze()
 
     print("Test")
 
-    si = Input((1, 1), (29, 9))
-    fi_1 = Input((29, 9), (1, 1), "length")
-    fi_2 = Input((8, 5), (29, 9), "match")
+    si = Input([(1, 1), (1, 1), (1, 1)], [(29, 9), (29, 19), (20, 9)])
+    fi_1 = Input([(29, 9), (29, 19), (20, 9)], [(1, 1), (1, 1), (1, 1)], "length")
+    fi_2 = Input([(None, None), (None, None), (None, None)], [(29, 9), (29, 19), (20, 9)], "contains")
+    # fi_2 = Input([(8, 5), (14, 10), (13, 3)], [(29, 9), (29, 19), (20, 9)], "contains")
 
-    # solve_maze(si, si, base)
+    # Print solved mazes to ensure base program is working correctly
+    for i in range(0, len(m)):
+        path = list(base.MazeSolver(m[i]).astar(si.start[i], si.goal[i]))
+        print(drawmaze(m[i], list(path)))
+
     # MR1
     print("MR-1")
     score = 0
-    score += solve_maze("MR-1 - control", si, fi_1, base)
-    score += solve_maze("MR-1 - m00", si, fi_1, m0)
-    score += solve_maze("MR-1 - m01", si, fi_1, m1)
-    score += solve_maze("MR-1 - m02", si, fi_1, m2)
-    score += solve_maze("MR-1 - m03", si, fi_1, m3)
-    score += solve_maze("MR-1 - m04", si, fi_1, m4)
-    score += solve_maze("MR-1 - m05", si, fi_1, m5)
-    score += solve_maze("MR-1 - m06", si, fi_1, m6)
-    score += solve_maze("MR-1 - m07", si, fi_1, m7)
-    score += solve_maze("MR-1 - m08", si, fi_1, m8)
-    score += solve_maze("MR-1 - m09", si, fi_1, m9)
-    score += solve_maze("MR-1 - m10", si, fi_1, m10)
-    score += solve_maze("MR-1 - m11", si, fi_1, m11)
-    score += solve_maze("MR-1 - m12", si, fi_1, m12)
-    score += solve_maze("MR-1 - m13", si, fi_1, m13)
-    score += solve_maze("MR-1 - m14", si, fi_1, m14)
-    score += solve_maze("MR-1 - m15", si, fi_1, m15)
-    score += solve_maze("MR-1 - m16", si, fi_1, m16)
-    score += solve_maze("MR-1 - m17", si, fi_1, m17)
-    score += solve_maze("MR-1 - m18", si, fi_1, m18)
-    score += solve_maze("MR-1 - m19", si, fi_1, m19)
+    score += solve_maze("MR-1 - control", m, si, fi_1, base)
+    score += solve_maze("MR-1 - m00", m, si, fi_1, m0)
+    score += solve_maze("MR-1 - m01", m, si, fi_1, m1)
+    score += solve_maze("MR-1 - m02", m, si, fi_1, m2)
+    score += solve_maze("MR-1 - m03", m, si, fi_1, m3)
+    score += solve_maze("MR-1 - m04", m, si, fi_1, m4)
+    score += solve_maze("MR-1 - m05", m, si, fi_1, m5)
+    score += solve_maze("MR-1 - m06", m, si, fi_1, m6)
+    score += solve_maze("MR-1 - m07", m, si, fi_1, m7)
+    score += solve_maze("MR-1 - m08", m, si, fi_1, m8)
+    score += solve_maze("MR-1 - m09", m, si, fi_1, m9)
+    score += solve_maze("MR-1 - m10", m, si, fi_1, m10)
+    score += solve_maze("MR-1 - m11", m, si, fi_1, m11)
+    score += solve_maze("MR-1 - m12", m, si, fi_1, m12)
+    score += solve_maze("MR-1 - m13", m, si, fi_1, m13)
+    score += solve_maze("MR-1 - m14", m, si, fi_1, m14)
+    score += solve_maze("MR-1 - m15", m, si, fi_1, m15)
+    score += solve_maze("MR-1 - m16", m, si, fi_1, m16)
+    score += solve_maze("MR-1 - m17", m, si, fi_1, m17)
+    score += solve_maze("MR-1 - m18", m, si, fi_1, m18)
+    score += solve_maze("MR-1 - m19", m, si, fi_1, m19)
 
     print(f"MR1: {score}/20 = {score/20 * 100}%")
 
     # MR2
     print("\nMR-2")
     score = 0
-    score += solve_maze("MR-2 - control", si, fi_2, base)
-    score += solve_maze("MR-2 - m00", si, fi_2, m0)
-    score += solve_maze("MR-2 - m01", si, fi_2, m1)
-    score += solve_maze("MR-2 - m02", si, fi_2, m2)
-    score += solve_maze("MR-2 - m03", si, fi_2, m3)
-    score += solve_maze("MR-2 - m04", si, fi_2, m4)
-    score += solve_maze("MR-2 - m05", si, fi_2, m5)
-    score += solve_maze("MR-2 - m06", si, fi_2, m6)
-    score += solve_maze("MR-2 - m07", si, fi_2, m7)
-    score += solve_maze("MR-2 - m08", si, fi_2, m8)
-    score += solve_maze("MR-2 - m09", si, fi_2, m9)
-    score += solve_maze("MR-2 - m10", si, fi_2, m10)
-    score += solve_maze("MR-2 - m11", si, fi_2, m11)
-    score += solve_maze("MR-2 - m12", si, fi_2, m12)
-    score += solve_maze("MR-2 - m13", si, fi_2, m13)
-    score += solve_maze("MR-2 - m14", si, fi_2, m14)
-    score += solve_maze("MR-2 - m15", si, fi_2, m15)
-    score += solve_maze("MR-2 - m16", si, fi_2, m16)
-    score += solve_maze("MR-2 - m17", si, fi_2, m17)
-    score += solve_maze("MR-2 - m18", si, fi_2, m18)
-    score += solve_maze("MR-2 - m19", si, fi_2, m19)
+    score += solve_maze("MR-2 - control", m, si, fi_2, base)
+    score += solve_maze("MR-2 - m00", m, si, fi_2, m0)
+    score += solve_maze("MR-2 - m01", m, si, fi_2, m1)
+    score += solve_maze("MR-2 - m02", m, si, fi_2, m2)
+    score += solve_maze("MR-2 - m03", m, si, fi_2, m3)
+    score += solve_maze("MR-2 - m04", m, si, fi_2, m4)
+    score += solve_maze("MR-2 - m05", m, si, fi_2, m5)
+    score += solve_maze("MR-2 - m06", m, si, fi_2, m6)
+    score += solve_maze("MR-2 - m07", m, si, fi_2, m7)
+    score += solve_maze("MR-2 - m08", m, si, fi_2, m8)
+    score += solve_maze("MR-2 - m09", m, si, fi_2, m9)
+    score += solve_maze("MR-2 - m10", m, si, fi_2, m10)
+    score += solve_maze("MR-2 - m11", m, si, fi_2, m11)
+    score += solve_maze("MR-2 - m12", m, si, fi_2, m12)
+    score += solve_maze("MR-2 - m13", m, si, fi_2, m13)
+    score += solve_maze("MR-2 - m14", m, si, fi_2, m14)
+    score += solve_maze("MR-2 - m15", m, si, fi_2, m15)
+    score += solve_maze("MR-2 - m16", m, si, fi_2, m16)
+    score += solve_maze("MR-2 - m17", m, si, fi_2, m17)
+    score += solve_maze("MR-2 - m18", m, si, fi_2, m18)
+    score += solve_maze("MR-2 - m19", m, si, fi_2, m19)
 
     print(f"MR2: {score}/20 = {score / 20 * 100}%")
 
